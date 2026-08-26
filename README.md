@@ -10,11 +10,38 @@ pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 \`\`\`
 
+## Configuration
+
+The service reads its configuration from environment variables.
+
+| Variable     | Required | Description                                               |
+|--------------|----------|-----------------------------------------------------------|
+| `AUTH_TOKEN` | Yes      | Bearer token required on every `/v1/*` route.             |
+
+See `.env.example` for a template. Before running locally, export it:
+
+\`\`\`bash
+export AUTH_TOKEN=your-secret-token-here
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+\`\`\`
+
+## Authentication
+
+Every route under `/v1/*` (any HTTP method) requires an
+`Authorization: Bearer <token>` header matching `AUTH_TOKEN`. Missing or
+invalid tokens return `401` with the error envelope:
+
+\`\`\`json
+{ "error": { "code": "unauthorized", "message": "..." } }
+\`\`\`
+
+`/health` and `/spec` remain public and require no authentication.
+
 ## Development status
 
 - [x] Phase 0: project setup
 - [x] Phase 1: /health and /spec routes
-- [ ] Phase 2: authentication
+- [x] Phase 2: authentication
 - [ ] Phase 3: diff parsing
 - [ ] Phase 4: mock provider rules
 - [ ] Phase 5: async job system
