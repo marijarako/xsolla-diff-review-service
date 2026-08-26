@@ -37,12 +37,26 @@ invalid tokens return `401` with the error envelope:
 
 `/health` and `/spec` remain public and require no authentication.
 
+## Diff Parsing
+
+The service parses unified diff text (as produced by `git diff`) into a
+structured list of files, each with its added ("+") lines and their line
+numbers in the new file.
+
+Notes on parsing behavior:
+- Only line numbers in the **new** file are tracked (removed lines do not
+  advance the line counter, since they don't exist in the new file).
+- Files that were deleted (`+++ /dev/null`) are skipped - there is nothing
+  meaningful to review in a deleted file.
+- A diff with no valid hunk headers (`@@ ... @@`) is rejected as
+  unparseable.
+
 ## Development status
 
 - [x] Phase 0: project setup
 - [x] Phase 1: /health and /spec routes
 - [x] Phase 2: authentication
-- [ ] Phase 3: diff parsing
+- [x] Phase 3: diff parsing
 - [ ] Phase 4: mock provider rules
 - [ ] Phase 5: async job system
 - [ ] Phase 6: GET routes for job status
