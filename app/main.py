@@ -1,12 +1,12 @@
 """
 Main entry point of the service.
 
-Phase 1: only /health and /spec routes (public, no authentication).
-Everything else (auth, diff analysis, jobs) is added in later phases.
+Phase 1: /health and /spec routes (public, no authentication).
+Phase 2: authentication middleware protecting all /v1/* routes.
 """
-
 import time
 from fastapi import FastAPI
+from app.auth import AuthMiddleware
 
 # Service version - we bump this manually on meaningful changes.
 # "semver" = Semantic Versioning: MAJOR.MINOR.PATCH
@@ -18,6 +18,7 @@ START_TIME = time.time()
 
 app = FastAPI(title="AI Diff Review Service", version=SERVICE_VERSION)
 
+app.add_middleware(AuthMiddleware)
 
 @app.get("/health")
 def health():
@@ -51,3 +52,12 @@ def spec():
             "rateLimitPerMinute": 30,
         },
     }
+
+@app.get("/v1/_authcheck")
+def auth_check():
+    """
+    TEMPORARY route, used only to manually verify the auth middleware
+    works before real /v1 routes exist (added in later phases).
+    Will be removed once /v1/reviews is implemented.
+    """
+    return {"authenticated": True}
